@@ -1,0 +1,45 @@
+- name: Verify app source exists on control machine
+  ansible.builtin.stat:
+    path: "{{ app_src }}"
+  register: app_src_stat
+  delegate_to: localhost
+  run_once: true
+
+- name: Fail if app source path is missing
+  ansible.builtin.fail:
+    msg: "app_src does not exist on control machine: {{ app_src }}"
+  when: not app_src_stat.stat.exists
+
+- name: Ensure app destination exists on target
+  ansible.builtin.file:
+    path: "{{ app_dest }}"
+    state: directory
+    mode: "0755"
+
+- name: Sync app sources to target
+  ansible.builtin.copy:
+    src: "{{ app_src }}/"
+    dest: "{{ app_dest }}/"
+    owner: root
+    group: root
+    mode: "0644"
+    directory_mode: "0755"
+
+- name: Pull images (optional)
+  ansible.builtin.command:
+    cmd: >-
+      docker compose
+      -f {{ compose_file }}
+      {% if compose_project_name %}--project-name {{ compose_project_name }}{% endif %}
+      pull
+    chdir: "{{ app_dest }}"
+  when: compose_pull
+
+- name: Build and start services
+  ansible.builtin.command:
+    cmd: >-
+      docker compose
+      -f {{ compose_file }}
+      {% if compose_project_name %}--project-name {{ compose_project_name }}{% endif %}
+      up {{ compose_up_args }}{% if compose_build %} --build{% endif %}
+    chdir: "{{ app_dest }}"

@@ -15,6 +15,16 @@ Ansible playbooks to install and configure Docker on a VM and run Docker Compose
 ansible-playbook site.yml
 ```
 
+## Deploy Focus app
+Use the provided deploy playbook to sync the local Focus project to the VM and run Docker Compose.
+
+1) Set `app_src` in `group_vars/docker_hosts.yml` to the local path of the Focus project.
+2) Run:
+
+```bash
+ansible-playbook deploy_focus.yml
+```
+
 ## Variables
 Defined in `group_vars/docker_hosts.yml` or per-host/group.
 

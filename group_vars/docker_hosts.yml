@@ -14,3 +14,13 @@ docker_daemon_config:
   log-opts:
     max-size: "10m"
     max-file: "3"
+
+# App deploy settings
+# app_src is local path on control machine
+app_src: "/Users/snapp/Desktop/projects/Focus"
+app_dest: "/opt/focus"
+compose_file: "docker-compose.yml"
+compose_project_name: ""
+compose_build: true
+compose_pull: false
+compose_up_args: "-d"

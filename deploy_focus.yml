@@ -1,0 +1,6 @@
+- name: Deploy Focus app with Docker Compose
+  hosts: docker_hosts
+  become: true
+  roles:
+    - docker
+    - app_deploy
