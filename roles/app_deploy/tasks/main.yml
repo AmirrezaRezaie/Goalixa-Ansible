@@ -17,7 +17,21 @@
     state: directory
     mode: "0755"
 
-- name: Sync app sources to target
+- name: Ensure rsync is installed on target
+  ansible.builtin.package:
+    name: rsync
+    state: present
+  when: app_sync_method == "rsync"
+
+- name: Sync app sources to target with rsync
+  ansible.builtin.synchronize:
+    src: "{{ app_src }}/"
+    dest: "{{ app_dest }}/"
+    delete: "{{ app_sync_delete }}"
+    rsync_opts: "{{ app_sync_excludes | map('regex_replace', '^(.*)$', '--exclude=\\1') | list }}"
+  when: app_sync_method == "rsync"
+
+- name: Sync app sources to target with copy
   ansible.builtin.copy:
     src: "{{ app_src }}/"
     dest: "{{ app_dest }}/"
@@ -25,6 +39,7 @@
     group: root
     mode: "0644"
     directory_mode: "0755"
+  when: app_sync_method != "rsync"
 
 - name: Pull images (optional)
   ansible.builtin.command:
