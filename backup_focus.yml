@@ -1,0 +1,5 @@
+- name: Backup Focus sqlite database
+  hosts: docker_hosts
+  become: true
+  roles:
+    - sqlite_backup

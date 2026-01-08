@@ -14,3 +14,4 @@ app_sync_excludes:
   - ".venv"
   - "venv"
   - "node_modules"
+  - "db.sqlite3"

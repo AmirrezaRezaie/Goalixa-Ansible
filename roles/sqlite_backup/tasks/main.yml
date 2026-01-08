@@ -1,0 +1,28 @@
+- name: Ensure local backup directory exists
+  ansible.builtin.file:
+    path: "{{ sqlite_backup_dir }}"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Check sqlite database exists on target
+  ansible.builtin.stat:
+    path: "{{ sqlite_db_path }}"
+  register: sqlite_db_stat
+
+- name: Fail if sqlite database is missing
+  ansible.builtin.fail:
+    msg: "sqlite_db_path does not exist on target: {{ sqlite_db_path }}"
+  when: not sqlite_db_stat.stat.exists
+
+- name: Build sqlite backup filename
+  ansible.builtin.set_fact:
+    sqlite_backup_name: "{{ (sqlite_backup_filename | length > 0) | ternary(sqlite_backup_filename, inventory_hostname ~ ((sqlite_backup_timestamp | bool) | ternary('-' ~ ansible_date_time.iso8601_basic, '')) ~ '.sqlite3') }}"
+
+- name: Fetch sqlite database to control machine
+  ansible.builtin.fetch:
+    src: "{{ sqlite_db_path }}"
+    dest: "{{ sqlite_backup_dir }}/{{ sqlite_backup_name }}"
+    flat: true

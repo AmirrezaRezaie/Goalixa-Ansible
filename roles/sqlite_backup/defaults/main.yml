@@ -1,0 +1,4 @@
+sqlite_db_path: "/opt/focus/db.sqlite3"
+sqlite_backup_dir: "{{ playbook_dir }}/backups"
+sqlite_backup_filename: ""
+sqlite_backup_timestamp: true
