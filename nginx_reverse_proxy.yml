@@ -1,0 +1,5 @@
+- name: Configure nginx reverse proxy for app container
+  hosts: docker_hosts
+  become: true
+  roles:
+    - nginx_proxy

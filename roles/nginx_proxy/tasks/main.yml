@@ -1,0 +1,40 @@
+- name: Install nginx
+  package:
+    name: nginx
+    state: present
+
+- name: Set nginx site paths
+  set_fact:
+    nginx_site_path: >-
+      {{ (ansible_facts.os_family == 'Debian') | ternary(
+          '/etc/nginx/sites-available/' ~ nginx_site_name,
+          '/etc/nginx/conf.d/' ~ nginx_site_name ~ '.conf'
+        ) }}
+    nginx_site_link: >-
+      {{ (ansible_facts.os_family == 'Debian') | ternary(
+          '/etc/nginx/sites-enabled/' ~ nginx_site_name,
+          omit
+        ) }}
+
+- name: Configure nginx reverse proxy
+  template:
+    src: site.conf.j2
+    dest: "{{ nginx_site_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload nginx
+
+- name: Enable nginx site (Debian)
+  file:
+    src: "{{ nginx_site_path }}"
+    dest: "{{ nginx_site_link }}"
+    state: link
+  when: ansible_facts.os_family == 'Debian'
+  notify: Reload nginx
+
+- name: Ensure nginx is running
+  service:
+    name: nginx
+    state: started
+    enabled: true
