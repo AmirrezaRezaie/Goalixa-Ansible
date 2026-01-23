@@ -1,0 +1,5 @@
+monitoring_dest: "/opt/monitoring/node_exporter"
+stack_name: "monitoring_node_exporter"
+monitoring_network: "monitoring_net"
+
+node_exporter_image: "prom/node-exporter:latest"

@@ -1,0 +1,5 @@
+- name: Deploy node_exporter on Docker Swarm
+  hosts: docker_hosts
+  become: true
+  roles:
+    - monitoring_node_exporter

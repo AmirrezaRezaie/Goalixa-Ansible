@@ -1,0 +1,41 @@
+- name: Ensure node_exporter directory exists on VM
+  ansible.builtin.file:
+    path: "{{ monitoring_dest }}"
+    state: directory
+    mode: "0755"
+
+- name: Render node_exporter stack file
+  ansible.builtin.template:
+    src: stack.yml.j2
+    dest: "{{ monitoring_dest }}/stack.yml"
+    mode: "0644"
+
+- name: Ensure Docker Swarm is active
+  ansible.builtin.command: docker info --format '{{ "{{" }} .Swarm.LocalNodeState {{ "}}" }}'
+  register: swarm_state
+  changed_when: false
+
+- name: Fail if swarm is not active
+  ansible.builtin.fail:
+    msg: "Docker Swarm is not active on this node. Run: docker swarm init --advertise-addr <SERVER_IP>"
+  when: swarm_state.stdout != "active"
+
+- name: Ensure overlay network exists ({{ monitoring_network }})
+  ansible.builtin.command: docker network create --driver overlay --attachable {{ monitoring_network }}
+  register: net_create
+  changed_when: net_create.rc == 0
+  failed_when: net_create.rc != 0 and ("already exists" not in (net_create.stderr | lower))
+
+- name: Deploy node_exporter stack
+  ansible.builtin.command: docker stack deploy --resolve-image always -c "{{ monitoring_dest }}/stack.yml" "{{ stack_name }}"
+  register: deploy_out
+  changed_when: true
+
+- name: Show stack services
+  ansible.builtin.command: docker stack services "{{ stack_name }}"
+  register: stack_services
+  changed_when: false
+
+- name: Print stack services
+  ansible.builtin.debug:
+    var: stack_services.stdout_lines

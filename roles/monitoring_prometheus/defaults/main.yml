@@ -1,0 +1,14 @@
+monitoring_dest: "/opt/monitoring/prometheus"
+stack_name: "monitoring_prometheus"
+monitoring_network: "monitoring_net"
+
+prometheus_image: "prom/prometheus:latest"
+
+# DNS name for the node_exporter service in Swarm.
+# If you deploy the node_exporter stack with stack_name=monitoring_node_exporter
+# and service_name=node_exporter, this resolves to:
+# tasks.monitoring_node_exporter_node_exporter
+node_exporter_service_dns: "tasks.monitoring_node_exporter_node_exporter"
+
+prometheus_retention_time: "15d"
+prometheus_scrape_interval: "15s"

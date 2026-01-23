@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  prometheus:
+    image: "{{ prometheus_image }}"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time={{ prometheus_retention_time }}"
+    volumes:
+      - "prometheus_data:/prometheus"
+      - "{{ monitoring_dest }}/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+    networks:
+      - "{{ monitoring_network }}"
+    ports:
+      - "9090:9090"
+    deploy:
+      replicas: 1
+
+volumes:
+  prometheus_data:
+
+networks:
+  {{ monitoring_network }}:
+    external: true

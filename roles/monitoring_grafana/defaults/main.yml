@@ -1,0 +1,10 @@
+monitoring_dest: "/opt/monitoring/grafana"
+stack_name: "monitoring_grafana"
+monitoring_network: "monitoring_net"
+
+grafana_image: "grafana/grafana:latest"
+grafana_admin_user: "admin"
+grafana_admin_password: "admin"
+
+# Prometheus service DNS name in Swarm (stack_service).
+prometheus_service_dns: "monitoring_prometheus_prometheus"

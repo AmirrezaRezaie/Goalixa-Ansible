@@ -1,0 +1,5 @@
+- name: Deploy Prometheus on Docker Swarm
+  hosts: docker_hosts
+  become: true
+  roles:
+    - monitoring_prometheus

@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  node_exporter:
+    image: "{{ node_exporter_image }}"
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/rootfs"
+    volumes:
+      - "/proc:/host/proc:ro"
+      - "/sys:/host/sys:ro"
+      - "/:/rootfs:ro"
+    networks:
+      - "{{ monitoring_network }}"
+    deploy:
+      mode: global
+
+networks:
+  {{ monitoring_network }}:
+    external: true
