@@ -24,6 +24,45 @@
     enabled: true
     state: started
 
+- name: Wait for PostgreSQL to accept connections
+  wait_for:
+    host: 127.0.0.1
+    port: 5432
+    state: started
+    delay: 2
+    timeout: 30
+
+- name: Find PostgreSQL socket file
+  find:
+    paths: "{{ postgres_socket_search_paths }}"
+    patterns: ".s.PGSQL.5432"
+    file_type: any
+  register: postgres_socket_find
+
+- name: Check socket candidates
+  stat:
+    path: "{{ item.path }}"
+  loop: "{{ postgres_socket_find.files }}"
+  register: postgres_socket_candidates
+
+- name: Use detected PostgreSQL socket directory when available
+  set_fact:
+    postgres_unix_socket: >-
+      {{
+        (postgres_socket_candidates.results
+         | selectattr('stat.issock')
+         | map(attribute='stat.path')
+         | map('dirname')
+         | list
+         | first)
+        | default(postgres_unix_socket)
+      }}
+
+- name: Fail if PostgreSQL socket is missing
+  fail:
+    msg: "PostgreSQL socket not found in {{ postgres_socket_search_paths }}; verify the service is running."
+  when: postgres_socket_candidates.results | selectattr('stat.issock') | list | length == 0
+
 - name: Ensure PostgreSQL user exists
   community.postgresql.postgresql_user:
     name: "{{ postgres_user }}"

@@ -21,6 +21,11 @@ postgres_initdb_marker_map:
   RedHat: /var/lib/pgsql/data/PG_VERSION
 
 postgres_unix_socket: /var/run/postgresql
+postgres_socket_search_paths:
+  - /run/postgresql
+  - /var/run/postgresql
+  - /var/lib/pgsql
+  - /tmp
 
 postgres_db: goalixa_auth
 postgres_user: goalixa_auth
