@@ -1,0 +1,5 @@
+- name: Deploy monitoring stack (Prometheus + Grafana + node_exporter)
+  hosts: docker_hosts
+  become: true
+  roles:
+    - monitoring_stack

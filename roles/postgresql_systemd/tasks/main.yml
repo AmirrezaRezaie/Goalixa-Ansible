@@ -1,0 +1,41 @@
+- name: Resolve PostgreSQL settings for OS family
+  set_fact:
+    postgres_packages: "{{ postgres_packages_map[ansible_os_family] | default(postgres_packages_map['Debian']) }}"
+    postgres_service: "{{ postgres_service_map[ansible_os_family] | default(postgres_service_map['Debian']) }}"
+    postgres_initdb_command: "{{ postgres_initdb_command_map[ansible_os_family] | default('') }}"
+    postgres_initdb_marker: "{{ postgres_initdb_marker_map[ansible_os_family] | default('') }}"
+
+- name: Install PostgreSQL packages
+  package:
+    name: "{{ postgres_packages }}"
+    state: present
+
+- name: Initialize PostgreSQL data directory when required
+  command: "{{ postgres_initdb_command }}"
+  args:
+    creates: "{{ postgres_initdb_marker }}"
+  when:
+    - postgres_initdb_command | length > 0
+    - postgres_initdb_marker | length > 0
+
+- name: Ensure PostgreSQL service is enabled and running
+  service:
+    name: "{{ postgres_service }}"
+    enabled: true
+    state: started
+
+- name: Ensure PostgreSQL user exists
+  community.postgresql.postgresql_user:
+    name: "{{ postgres_user }}"
+    password: "{{ postgres_password }}"
+    login_unix_socket: "{{ postgres_unix_socket }}"
+    state: present
+  become_user: postgres
+
+- name: Ensure PostgreSQL database exists
+  community.postgresql.postgresql_db:
+    name: "{{ postgres_db }}"
+    owner: "{{ postgres_user }}"
+    login_unix_socket: "{{ postgres_unix_socket }}"
+    state: present
+  become_user: postgres

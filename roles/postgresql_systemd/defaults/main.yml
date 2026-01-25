@@ -1,0 +1,27 @@
+postgres_packages_map:
+  Debian:
+    - postgresql
+    - postgresql-contrib
+    - python3-psycopg2
+  RedHat:
+    - postgresql-server
+    - postgresql-contrib
+    - python3-psycopg2
+
+postgres_service_map:
+  Debian: postgresql
+  RedHat: postgresql
+
+postgres_initdb_command_map:
+  Debian: ""
+  RedHat: postgresql-setup --initdb
+
+postgres_initdb_marker_map:
+  Debian: ""
+  RedHat: /var/lib/pgsql/data/PG_VERSION
+
+postgres_unix_socket: /var/run/postgresql
+
+postgres_db: goalixa_auth
+postgres_user: goalixa_auth
+postgres_password: change_me

@@ -1,0 +1,5 @@
+- name: Install PostgreSQL with systemd
+  hosts: db_hosts
+  become: true
+  roles:
+    - postgresql_systemd

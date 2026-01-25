@@ -1,0 +1,13 @@
+monitoring_dest: "/opt/monitoring"
+stack_name: "monitoring"
+monitoring_network: "monitoring_net"
+
+prometheus_image: "prom/prometheus:latest"
+grafana_image: "grafana/grafana:latest"
+node_exporter_image: "prom/node-exporter:latest"
+
+grafana_admin_user: "admin"
+grafana_admin_password: "admin"
+
+prometheus_retention_time: "15d"
+prometheus_scrape_interval: "15s"
